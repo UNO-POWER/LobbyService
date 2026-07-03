@@ -1,6 +1,8 @@
 package com.unopower.lobbyservice.web;
 
+import com.unopower.lobbyservice.service.SalaLlenaException;
 import com.unopower.lobbyservice.service.SalaNoEncontradaException;
+import com.unopower.lobbyservice.service.SalaYaIniciadaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +18,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SalaNoEncontradaException.class)
     public ResponseEntity<Map<String, Object>> handleNoEncontrada(SalaNoEncontradaException ex) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(SalaLlenaException.class)
+    public ResponseEntity<Map<String, Object>> handleLlena(SalaLlenaException ex) {
+        return build(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(SalaYaIniciadaException.class)
+    public ResponseEntity<Map<String, Object>> handleYaIniciada(SalaYaIniciadaException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(IllegalStateException.class)

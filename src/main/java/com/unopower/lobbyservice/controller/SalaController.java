@@ -30,6 +30,13 @@ public class SalaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(sala);
     }
 
+    @PostMapping("/{codigo}/unirse")
+    public ResponseEntity<SalaResponse> unirse(@PathVariable String codigo, HttpServletRequest httpRequest) {
+        String userId = requireHeader(httpRequest, USER_ID_HEADER);
+        String username = requireHeader(httpRequest, USERNAME_HEADER);
+        return ResponseEntity.ok(salaService.unirse(codigo.toUpperCase(), userId, username));
+    }
+
     @GetMapping("/{codigo}")
     public ResponseEntity<SalaResponse> obtener(@PathVariable String codigo) {
         return ResponseEntity.ok(salaService.obtener(codigo.toUpperCase()));

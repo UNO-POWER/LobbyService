@@ -2,6 +2,7 @@ package com.unopower.lobbyservice.service;
 
 import com.unopower.lobbyservice.dto.CrearSalaRequest;
 import com.unopower.lobbyservice.dto.SalaResponse;
+import com.unopower.lobbyservice.model.EstadoSala;
 import com.unopower.lobbyservice.model.MiembroSala;
 import com.unopower.lobbyservice.model.Sala;
 import com.unopower.lobbyservice.repository.SalaRepository;
@@ -18,10 +19,13 @@ public class SalaService {
 
     private final SalaRepository salaRepository;
     private final CodigoSalaGenerator codigoSalaGenerator;
+    private final GameServiceClient gameServiceClient;
 
-    public SalaService(SalaRepository salaRepository, CodigoSalaGenerator codigoSalaGenerator) {
+    public SalaService(SalaRepository salaRepository, CodigoSalaGenerator codigoSalaGenerator,
+                        GameServiceClient gameServiceClient) {
         this.salaRepository = salaRepository;
         this.codigoSalaGenerator = codigoSalaGenerator;
+        this.gameServiceClient = gameServiceClient;
     }
 
     @Transactional
@@ -34,6 +38,29 @@ public class SalaService {
 
         log.info("sala creada codigo={} anfitrion={}", sala.getCodigo(), anfitrionUserId);
         return SalaResponse.from(sala);
+    }
+
+    @Transactional
+    public SalaResponse unirse(String codigo, String userId, String username) {
+        Sala sala = salaRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new SalaNoEncontradaException(codigo));
+
+        if (sala.getEstado() != EstadoSala.LOBBY) {
+            throw new SalaYaIniciadaException(codigo);
+        }
+        if (sala.getMiembros().size() >= sala.getMaxJugadores()) {
+            throw new SalaLlenaException(codigo);
+        }
+        boolean yaEsMiembro = sala.getMiembros().stream().anyMatch(m -> m.getUserId().equals(userId));
+        if (!yaEsMiembro) {
+            sala.agregarMiembro(new MiembroSala(userId, username, false));
+            sala = salaRepository.save(sala);
+        }
+
+        SalaResponse response = SalaResponse.from(sala);
+        log.info("jugador unido codigo={} userId={} totalJugadores={}", codigo, userId, response.jugadores().size());
+        gameServiceClient.notificarRosterActualizado(response);
+        return response;
     }
 
     @Transactional(readOnly = true)
