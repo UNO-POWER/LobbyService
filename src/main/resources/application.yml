@@ -1,0 +1,33 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: lobby-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/uno?currentSchema=lobby_db}
+    username: ${SPRING_DATASOURCE_USERNAME:uno}
+    password: ${SPRING_DATASOURCE_PASSWORD:uno}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: lobby_db
+    open-in-view: false
+
+services:
+  game-service:
+    url: ${GAME_SERVICE_URL:http://localhost:8083}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  config: classpath:logback-spring.xml
