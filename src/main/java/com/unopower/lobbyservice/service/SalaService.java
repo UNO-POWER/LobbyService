@@ -69,4 +69,37 @@ public class SalaService {
                 .orElseThrow(() -> new SalaNoEncontradaException(codigo));
         return SalaResponse.from(sala);
     }
+
+    /**
+     * HU-03 (inicio de partida): solo el anfitrion, con al menos 2 jugadores. Si Game
+     * Service no responde, la sala NO se marca EN_JUEGO (se propaga el error, a diferencia
+     * de la notificacion best-effort del roster).
+     */
+    @Transactional
+    public SalaResponse iniciar(String codigo, String userId) {
+        Sala sala = salaRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new SalaNoEncontradaException(codigo));
+
+        if (!sala.getAnfitrionUserId().equals(userId)) {
+            throw new NoEresAnfitrionException();
+        }
+        if (sala.getEstado() != EstadoSala.LOBBY) {
+            throw new SalaYaIniciadaException(codigo);
+        }
+        if (sala.getMiembros().size() < 2) {
+            throw new JugadoresInsuficientesException();
+        }
+
+        SalaResponse response = SalaResponse.from(sala);
+        try {
+            gameServiceClient.iniciarPartida(codigo, response.jugadores());
+        } catch (Exception ex) {
+            throw new GameServiceNoDisponibleException(ex);
+        }
+
+        sala.setEstado(EstadoSala.EN_JUEGO);
+        salaRepository.save(sala);
+        log.info("partida iniciada codigo={} jugadores={}", codigo, response.jugadores().size());
+        return SalaResponse.from(sala);
+    }
 }

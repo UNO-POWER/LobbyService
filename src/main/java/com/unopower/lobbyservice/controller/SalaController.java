@@ -42,6 +42,12 @@ public class SalaController {
         return ResponseEntity.ok(salaService.obtener(codigo.toUpperCase()));
     }
 
+    @PostMapping("/{codigo}/iniciar")
+    public ResponseEntity<SalaResponse> iniciar(@PathVariable String codigo, HttpServletRequest httpRequest) {
+        String userId = requireHeader(httpRequest, USER_ID_HEADER);
+        return ResponseEntity.ok(salaService.iniciar(codigo.toUpperCase(), userId));
+    }
+
     private String requireHeader(HttpServletRequest request, String header) {
         String value = request.getHeader(header);
         if (value == null || value.isBlank()) {

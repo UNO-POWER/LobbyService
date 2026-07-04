@@ -1,5 +1,8 @@
 package com.unopower.lobbyservice.web;
 
+import com.unopower.lobbyservice.service.GameServiceNoDisponibleException;
+import com.unopower.lobbyservice.service.JugadoresInsuficientesException;
+import com.unopower.lobbyservice.service.NoEresAnfitrionException;
 import com.unopower.lobbyservice.service.SalaLlenaException;
 import com.unopower.lobbyservice.service.SalaNoEncontradaException;
 import com.unopower.lobbyservice.service.SalaYaIniciadaException;
@@ -33,6 +36,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException ex) {
         return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(NoEresAnfitrionException.class)
+    public ResponseEntity<Map<String, Object>> handleNoEresAnfitrion(NoEresAnfitrionException ex) {
+        return build(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(JugadoresInsuficientesException.class)
+    public ResponseEntity<Map<String, Object>> handleJugadoresInsuficientes(JugadoresInsuficientesException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(GameServiceNoDisponibleException.class)
+    public ResponseEntity<Map<String, Object>> handleGameServiceNoDisponible(GameServiceNoDisponibleException ex) {
+        return build(HttpStatus.BAD_GATEWAY, ex.getMessage());
     }
 
     private ResponseEntity<Map<String, Object>> build(HttpStatus status, String mensaje) {
