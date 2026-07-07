@@ -24,8 +24,12 @@ public class GameServiceClient {
 
     private final RestClient restClient;
 
-    public GameServiceClient(@Value("${services.game-service.url}") String gameServiceUrl) {
-        this.restClient = RestClient.builder().baseUrl(gameServiceUrl).build();
+    public GameServiceClient(@Value("${services.game-service.url}") String gameServiceUrl,
+                              @Value("${internal.api-key}") String internalApiKey) {
+        this.restClient = RestClient.builder()
+                .baseUrl(gameServiceUrl)
+                .defaultHeader("X-Internal-Key", internalApiKey)
+                .build();
     }
 
     public void notificarRosterActualizado(SalaResponse sala) {

@@ -20,6 +20,9 @@ services:
   game-service:
     url: ${GAME_SERVICE_URL:http://localhost:8083}
 
+internal:
+  api-key: ${INTERNAL_API_KEY:dev-internal-key-change-in-prod}
+
 management:
   endpoints:
     web:

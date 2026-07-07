@@ -1,6 +1,7 @@
 package com.unopower.lobbyservice.controller;
 
 import com.unopower.lobbyservice.dto.CrearSalaRequest;
+import com.unopower.lobbyservice.dto.ListaSalasPublicasResponse;
 import com.unopower.lobbyservice.dto.SalaResponse;
 import com.unopower.lobbyservice.service.SalaService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +36,14 @@ public class SalaController {
         String userId = requireHeader(httpRequest, USER_ID_HEADER);
         String username = requireHeader(httpRequest, USERNAME_HEADER);
         return ResponseEntity.ok(salaService.unirse(codigo.toUpperCase(), userId, username));
+    }
+
+    /** HU-09: matchmaking publico. La ruta literal gana sobre /{codigo}. */
+    @GetMapping("/publicas")
+    public ResponseEntity<ListaSalasPublicasResponse> listarPublicas(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamano) {
+        return ResponseEntity.ok(salaService.listarPublicas(pagina, tamano));
     }
 
     @GetMapping("/{codigo}")
