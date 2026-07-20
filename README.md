@@ -3,6 +3,7 @@
 > Creación de salas, matchmaking público y transferencia de control al Game Service —
 > microservicio de **UNO Power-Ups Arena**.
 
+[![CI](https://github.com/UNO-POWER/LobbyService/actions/workflows/ci.yml/badge.svg)](https://github.com/UNO-POWER/LobbyService/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-21-orange)]()
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)]()
 [![Tests](https://img.shields.io/badge/tests-16%20passing-success)]()
