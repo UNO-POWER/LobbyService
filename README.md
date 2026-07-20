@@ -7,7 +7,6 @@
 [![Java](https://img.shields.io/badge/Java-21-orange)]()
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)]()
 [![Tests](https://img.shields.io/badge/tests-16%20passing-success)]()
-[![License](https://img.shields.io/badge/license-MIT-blue)]()
 
 ---
 
@@ -33,8 +32,7 @@
 18. [Solución de problemas](#18-solución-de-problemas)
 19. [Roadmap](#19-roadmap)
 20. [Contribución](#20-contribución)
-21. [Licencia](#21-licencia)
-22. [Autor](#22-autor)
+21. [Autor](#21-autor)
 
 ---
 
@@ -42,10 +40,10 @@
 
 **Lobby Service** administra el ciclo de vida de una sala de UNO **antes** de que empiece la
 partida: creación con código único, unirse con ese código, listado de salas públicas
-(matchmaking) y la transferencia de control al [Game Service](../GameService) cuando el anfitrión
+(matchmaking) y la transferencia de control al [Game Service](https://github.com/UNO-POWER/GameService) cuando el anfitrión
 decide iniciar.
 
-No tiene UI propia: lo consume el [API Gateway](../APIGATEWAY) (`/api/salas/**`) y llama
+No tiene UI propia: lo consume el [API Gateway](https://github.com/UNO-POWER/APIGATEWAY) (`/api/salas/**`) y llama
 internamente al Game Service para avisarle de cambios de roster o para arrancar la partida.
 
 ### Historias de usuario que implementa
@@ -245,10 +243,11 @@ docker run -p 8082:8082 \
 ### Docker Compose (stack completo)
 
 ```bash
-docker compose up -d --build lobby-service
+docker build -t uno-lobby-service .
 ```
 
-Ver la [guía de infraestructura](../deploy/README.md) para el stack completo.
+En un entorno completo, este servicio se orquesta con Docker Compose junto a Postgres, el API
+Gateway y el Game Service.
 
 ---
 
@@ -468,8 +467,7 @@ irrelevante el costo del join).
 - **No valida JWT directamente** — modelo de "Gateway autoritativo": confía en los headers
   `X-User-Id`/`X-Username` que el Gateway solo agrega **después** de validar la firma del token.
   Si Lobby Service se expusiera directamente sin pasar por el Gateway, cualquiera podría
-  suplantar identidades — por eso en despliegue de producción **no publica puerto al host**
-  (ver [`docker-compose.prod.yml`](../deploy/docker-compose.prod.yml)).
+  suplantar identidades — por eso en despliegue de producción **no publica puerto al host**.
 - **`X-Internal-Key`** en las llamadas salientes a Game Service — mismo secreto compartido que
   usa User Service.
 - **Autorización explícita**: solo el `anfitrionUserId` guardado en la fila puede iniciar la
@@ -552,12 +550,12 @@ mvn test jacoco:report   # target/site/jacoco/index.html
 
 ## 17. Despliegue
 
-- **Docker**: `Dockerfile` multi-stage (Maven → JRE Alpine), igual patrón que los demás servicios.
-- **Docker Compose**: servicio `lobby-service` en [`docker-compose.yml`](../docker-compose.yml)
-  (dev) y en [`deploy/docker-compose.prod.yml`](../deploy/docker-compose.prod.yml) (producción,
-  sin puerto publicado al host, solo alcanzable vía Gateway y desde Game Service).
+- **Docker**: `Dockerfile` multi-stage (Maven → JRE Alpine) incluido en este repositorio, igual
+  patrón que los demás servicios.
+- **Orquestación**: en un despliegue completo se levanta con Docker Compose junto a los demás
+  servicios; en producción no publica puerto al host, solo es alcanzable vía Gateway y desde Game
+  Service.
 - **AWS**: contenedor en la misma EC2 que el resto del backend, contra RDS (schema `lobby_db`).
-  Ver el [runbook de despliegue](../deploy/DEPLOY.md).
 
 ---
 
@@ -593,15 +591,7 @@ mvn test jacoco:report   # target/site/jacoco/index.html
 
 ---
 
-## 21. Licencia
-
-MIT — ver [`LICENSE`](../LICENSE) en el repositorio raíz.
-
----
-
-## 22. Autor
+## 21. Autor
 
 **DUCU** — Desarrollador Full-Stack (individual), proyecto de la asignatura ARSW.
 Organización GitHub: [UNO-POWER](https://github.com/UNO-POWER).
-
-Repositorio raíz del sistema: **[UNO Power-Ups Arena](../README.md)**.
